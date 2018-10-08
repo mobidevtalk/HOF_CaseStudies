@@ -1,21 +1,40 @@
 //: A UIKit based Playground for presenting user interface
   
-import UIKit
-import PlaygroundSupport
+import Foundation
+import XCTest
 
-class MyViewController : UIViewController {
-    override func loadView() {
-        let view = UIView()
-        view.backgroundColor = .white
-
-        let label = UILabel()
-        label.frame = CGRect(x: 150, y: 200, width: 200, height: 20)
-        label.text = "Hello World!"
-        label.textColor = .black
-        
-        view.addSubview(label)
-        self.view = view
+//: Higher Order Function Case studies
+struct TwentyNine{
+    
+    func reckon() -> Int {
+        return 0
     }
 }
-// Present the view controller in the Live View window
-PlaygroundPage.current.liveView = MyViewController()
+
+
+//: Test cases
+class HofCaseStudiesTest: XCTestCase{
+    func testSetup() {
+        XCTAssert(true)
+    }
+    
+    func test_reckon() {
+        let twentyNine = TwentyNine()
+        XCTAssertEqual(twentyNine.reckon(), 0, "Default reckon Value should be zero")
+    }
+}
+
+
+//: Test Observer
+class TestObserver: NSObject, XCTestObservation {
+    func testCase(_ testCase: XCTestCase,
+                  didFailWithDescription description: String,
+                  inFile filePath: String?,
+                  atLine lineNumber: Int) {
+        assertionFailure(description, line: UInt(lineNumber))
+    }
+}
+
+let testObserver = TestObserver()
+XCTestObservationCenter.shared.addTestObserver(testObserver)
+HofCaseStudiesTest.defaultTestSuite.run()
