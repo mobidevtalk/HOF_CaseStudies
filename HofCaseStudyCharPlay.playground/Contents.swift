@@ -1,18 +1,18 @@
 import Foundation
 import XCTest
 
-enum Precedence: String{
+enum Favourite: String{
     case equal = "💖 = "
-    case second = "💙 = "
-    case first = "💚 = "
+    case blue = "💙 = "
+    case green = "💚 = "
 }
 
-extension Precedence{
+extension Favourite{
     var weight: Int{
         switch self {
-        case .first:
+        case .green:
             return 2
-        case .second:
+        case .blue:
             return 1
         default:
             return 0
@@ -21,7 +21,7 @@ extension Precedence{
     
 }
 
-typealias CombinedValue = (precedence: Precedence, count: Int)
+typealias CombinedValue = (precedence: Favourite, count: Int)
 
 func mix(_ s1: String, _ s2: String) -> String {
     let combined = combinedMaxChar(s1, s2)
@@ -43,9 +43,10 @@ func format(_ input: [Character: CombinedValue]?, with sortedKeys: [Character]?)
             combine += String($0)
         }
         
-        combine += "/"
+        combine += "\n"
     })
     combine.removeLast()
+    print("combine:\n\(combine)")
     return combine
 }
 
@@ -70,8 +71,8 @@ func combinedMaxChar(_ firstInput: String, _ secondInput: String) -> [Character:
         return nil
     }
     
-    let firstCombine = firstCharList?.mapValues({ CombinedValue(precedence: .first, $0) })
-    let secondCombine = secondCharList?.mapValues({ CombinedValue(precedence: .second, $0) })
+    let firstCombine = firstCharList?.mapValues({ CombinedValue(precedence: .green, $0) })
+    let secondCombine = secondCharList?.mapValues({ CombinedValue(precedence: .blue, $0) })
     
     return firstCombine?.merging(secondCombine!, uniquingKeysWith: { $0.count > $1.count ? $0 : $0.count == $1.count ? CombinedValue(precedence: .equal, count: $0.count) : $1 })
 }
@@ -198,19 +199,19 @@ class SolutionTest: XCTestCase {
     func test_combinedMaxChar_differentCharRepeatBothEntry_maxTimesChar_withPresedence() {
         let val = combinedMaxChar("aasd^#@$nnnna", "qaspqqq..,-0tttsssd")
         XCTAssertEqual(val?["a"]?.count, 3)
-        XCTAssertEqual(val?["a"]?.precedence, .first)
+        XCTAssertEqual(val?["a"]?.precedence, .green)
         
         XCTAssertEqual(val?["s"]?.count, 4)
-        XCTAssertEqual(val?["s"]?.precedence, .second)
+        XCTAssertEqual(val?["s"]?.precedence, .blue)
         
         XCTAssertEqual(val?["n"]?.count, 4)
-        XCTAssertEqual(val?["n"]?.precedence, .first)
+        XCTAssertEqual(val?["n"]?.precedence, .green)
         
         XCTAssertEqual(val?["q"]?.count, 4)
-        XCTAssertEqual(val?["q"]?.precedence, .second)
+        XCTAssertEqual(val?["q"]?.precedence, .blue)
         
         XCTAssertEqual(val?["t"]?.count, 3)
-        XCTAssertEqual(val?["t"]?.precedence, .second)
+        XCTAssertEqual(val?["t"]?.precedence, .blue)
         
         XCTAssertNil(val?["d"])
         XCTAssertNil(val?["p"])
@@ -233,22 +234,22 @@ class SolutionTest: XCTestCase {
     }
     
     func test_sortingKey_properInput_notNilOutput() {
-        let input: [Character: CombinedValue] = ["d": (Precedence.first, 4)]
+        let input: [Character: CombinedValue] = ["d": (Favourite.green, 4)]
         XCTAssertNotNil(sortKeys(input))
     }
     
     func test_sortingKey_heightCount_loweIndex() {
-        let input: [Character: CombinedValue] = ["d": (Precedence.first, 4),
-                                                 "v": (Precedence.second, 8)]
+        let input: [Character: CombinedValue] = ["d": (Favourite.green, 4),
+                                                 "v": (Favourite.blue, 8)]
         let output = sortKeys(input)
         XCTAssertTrue(output!.firstIndex(of: "v")! < output!.firstIndex(of: "d")!)
     }
     
     func test_sortingKey_sameCount_precedenceOrdered() {
-        let input:[Character: CombinedValue] = ["z": (Precedence.equal, 4),
-                                                "d": (Precedence.second, 4),
-                                                "j": (Precedence.first, 4),
-                                                "v": (Precedence.second, 8)
+        let input:[Character: CombinedValue] = ["z": (Favourite.equal, 4),
+                                                "d": (Favourite.blue, 4),
+                                                "j": (Favourite.green, 4),
+                                                "v": (Favourite.blue, 8)
         ]
         let output = sortKeys(input)!
         let firstOrder = output.firstIndex(of: "j")! < output.firstIndex(of: "d")!
@@ -258,14 +259,14 @@ class SolutionTest: XCTestCase {
     
     func test_sortingKey_sameCountSamePrecedence_alphabeticOrdered() {
         let input:[Character: CombinedValue] = [
-            "z": (Precedence.equal, 4),
-            "d": (Precedence.second, 4),
-            "j": (Precedence.first, 4),
-            "k": (Precedence.second, 4),
-            "i": (Precedence.first, 4),
-            "l": (Precedence.equal, 4),
-            "o": (Precedence.equal, 6),
-            "v": (Precedence.second, 8)
+            "z": (Favourite.equal, 4),
+            "d": (Favourite.blue, 4),
+            "j": (Favourite.green, 4),
+            "k": (Favourite.blue, 4),
+            "i": (Favourite.green, 4),
+            "l": (Favourite.equal, 4),
+            "o": (Favourite.equal, 6),
+            "v": (Favourite.blue, 8)
         ]
         let output = sortKeys(input)!
         let firstOrder = output.firstIndex(of: "i")! < output.firstIndex(of: "j")!
@@ -300,30 +301,30 @@ class SolutionTest: XCTestCase {
     }
     
     func test_format_multpleChar_timesPrint(){
-        let output = format(["z": (Precedence.equal, 4)],
+        let output = format(["z": (Favourite.equal, 4)],
                             with: ["z"])
         XCTAssertTrue(output.contains("zzzz"))
     }
     
     func test_format_returnShouldContainInputAsPrefix() {
-        let output = format(["z": (Precedence.equal, 4)],
+        let output = format(["z": (Favourite.equal, 4)],
                             with: ["z"])
         XCTAssertTrue(output.contains("💖 = zzzz"))
     }
     
     func test_format_lasEntry_shouldNotContaintSlash() {
-        let output = format(["z": (Precedence.equal, 4)],
+        let output = format(["z": (Favourite.equal, 4)],
                             with: ["z"])
-        XCTAssertNotEqual(output.last, "/")
+        XCTAssertNotEqual(String(output.last!), "\n")
     }
     
     func test_amongTwoEntry_slashShouldPresent() {
         let output = format([
-            "z": (Precedence.equal, 4),
-            "a": (Precedence.first, 3)
+            "z": (Favourite.equal, 4),
+            "a": (Favourite.green, 3)
             ], with: ["z" , "a"])
-        XCTAssertTrue(output.contains("/"))
-        XCTAssertEqual(output.filter({ $0 == "/" }).count, 1)
+        XCTAssertTrue(output.contains("\n"))
+        XCTAssertEqual(output.filter({ $0 == "\n" }).count, 1)
     }
     
     static var allTests = [
@@ -336,15 +337,15 @@ class SolutionTest: XCTestCase {
     
     func testExample() {
         testing("Are they here", "yes, they are here",
-                "💙 = eeeee/💙 = yy/💖 = hh/💖 = rr")
+                "💙 = eeeee\n💙 = yy\n💖 = hh\n💖 = rr")
         testing("looping is fun but dangerous", "less dangerous than coding",
-                "💚 = ooo/💚 = uuu/💙 = sss/💖 = nnn/💚 = ii/💙 = aa/💙 = dd/💙 = ee/💖 = gg")
+                "💚 = ooo\n💚 = uuu\n💙 = sss\n💖 = nnn\n💚 = ii\n💙 = aa\n💙 = dd\n💙 = ee\n💖 = gg")
         testing(" In many languages", " there's a pair of functions",
-                "💚 = aaa/💚 = nnn/💚 = gg/💙 = ee/💙 = ff/💙 = ii/💙 = oo/💙 = rr/💙 = ss/💙 = tt")
-        testing("Lords of the Fallen", "gamekult", "💚 = ee/💚 = ll/💚 = oo")
+                "💚 = aaa\n💚 = nnn\n💚 = gg\n💙 = ee\n💙 = ff\n💙 = ii\n💙 = oo\n💙 = rr\n💙 = ss\n💙 = tt")
+        testing("Lords of the Fallen", "gamekult", "💚 = ee\n💚 = ll\n💚 = oo")
         testing("codewars", "codewars", "")
         testing("A generation must confront the looming ",
-                "codewarrs", "💚 = nnnnn/💚 = ooooo/💚 = tttt/💚 = eee/💚 = gg/💚 = ii/💚 = mm/💖 = rr")
+                "codewarrs", "💚 = nnnnn\n💚 = ooooo\n💚 = tttt\n💚 = eee\n💚 = gg\n💚 = ii\n💚 = mm\n💖 = rr")
     }
 }
 
