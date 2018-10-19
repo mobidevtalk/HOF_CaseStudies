@@ -23,8 +23,8 @@ extension Favourite{
 
 typealias CombinedValue = (precedence: Favourite, count: Int)
 
-func mix(_ s1: String, _ s2: String) -> String {
-    let combined = combinedMaxChar(s1, s2)
+func compareQuote(_ green: String, _ blue: String) -> String {
+    let combined = combinedMaxChar(green, blue)
     let sortedKey = sortKeys(combined)
     
     return format(combined, with: sortedKey)
@@ -37,7 +37,7 @@ func format(_ input: [Character: CombinedValue]?, with sortedKeys: [Character]?)
     sortedKeys.forEach({
         guard let value = input[$0]else{return}
         
-        combine += value.precedence.rawValue
+        combine += value.precedence.rawValue + "[\(value.count) times \($0)] "
         
         for _ in 1...value.count {
             combine += String($0)
@@ -87,6 +87,11 @@ func parseChar(_ input: String) -> [Character: Int]?{
     
     return output.filter({ $0.value > 1 })
 }
+
+compareQuote("To be or not To be", "Nothing is permenant")
+
+compareQuote("Live as if you were to die tomorrow. Learn as if you were to live forever", "Be the change that you wish to see in the world")
+
 
 class SolutionTest: XCTestCase {
     
@@ -309,7 +314,7 @@ class SolutionTest: XCTestCase {
     func test_format_returnShouldContainInputAsPrefix() {
         let output = format(["z": (Favourite.equal, 4)],
                             with: ["z"])
-        XCTAssertTrue(output.contains("💖 = zzzz"))
+        XCTAssertTrue(output.contains("💖 = [4 times z] zzzz"))
     }
     
     func test_format_lasEntry_shouldNotContaintSlash() {
@@ -325,27 +330,6 @@ class SolutionTest: XCTestCase {
             ], with: ["z" , "a"])
         XCTAssertTrue(output.contains("\n"))
         XCTAssertEqual(output.filter({ $0 == "\n" }).count, 1)
-    }
-    
-    static var allTests = [
-        ("mix", testExample),
-        ]
-    
-    func testing(_ s1: String, _ s2: String, _ expected: String) {
-        XCTAssertEqual(mix(s1, s2), expected)
-    }
-    
-    func testExample() {
-        testing("Are they here", "yes, they are here",
-                "💙 = eeeee\n💙 = yy\n💖 = hh\n💖 = rr")
-        testing("looping is fun but dangerous", "less dangerous than coding",
-                "💚 = ooo\n💚 = uuu\n💙 = sss\n💖 = nnn\n💚 = ii\n💙 = aa\n💙 = dd\n💙 = ee\n💖 = gg")
-        testing(" In many languages", " there's a pair of functions",
-                "💚 = aaa\n💚 = nnn\n💚 = gg\n💙 = ee\n💙 = ff\n💙 = ii\n💙 = oo\n💙 = rr\n💙 = ss\n💙 = tt")
-        testing("Lords of the Fallen", "gamekult", "💚 = ee\n💚 = ll\n💚 = oo")
-        testing("codewars", "codewars", "")
-        testing("A generation must confront the looming ",
-                "codewarrs", "💚 = nnnnn\n💚 = ooooo\n💚 = tttt\n💚 = eee\n💚 = gg\n💚 = ii\n💚 = mm\n💖 = rr")
     }
 }
 
