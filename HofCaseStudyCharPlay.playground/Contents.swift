@@ -88,7 +88,7 @@ func parseChar(_ input: String) -> [Character: Int]?{
     return output.filter({ $0.value > 1 })
 }
 
-compareQuote("To be or not To be", "Nothing is permenant")
+compareQuote("To be or not To be", "Nothing is permanent")
 
 compareQuote("Live as if you were to die tomorrow. Learn as if you were to live forever", "Be the change that you wish to see in the world")
 
