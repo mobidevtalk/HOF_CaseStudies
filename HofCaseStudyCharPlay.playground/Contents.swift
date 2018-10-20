@@ -1,13 +1,13 @@
 import Foundation
 import XCTest
 
-enum Favourite: String{
+enum Heart: String{
     case equal = "💖 = "
     case blue = "💙 = "
     case green = "💚 = "
 }
 
-extension Favourite{
+extension Heart{
     var weight: Int{
         switch self {
         case .green:
@@ -18,10 +18,9 @@ extension Favourite{
             return 0
         }
     }
-    
 }
 
-typealias CombinedValue = (precedence: Favourite, count: Int)
+typealias CombinedValue = (precedence: Heart, count: Int)
 
 func compareQuote(_ green: String, _ blue: String) -> String {
     let combined = combinedMaxChar(green, blue)
@@ -61,20 +60,26 @@ func sortKeys(_ input: [Character: CombinedValue]?) -> [Character]?{
     }).map({ $0.key })
 }
 
-func combinedMaxChar(_ firstInput: String, _ secondInput: String) -> [Character: CombinedValue]?{
-    guard firstInput != secondInput else { return nil }
+func combinedMaxChar(_ firstQuote: String, _ secondQuote: String) -> [Character: CombinedValue]?{
+    guard firstQuote != secondQuote else { return nil }
     
-    let firstCharList = charCount(firstInput)
-    let secondCharList = charCount(secondInput)
+    let greenCharCount = charCount(firstQuote)
+    let blueCharCount = charCount(secondQuote)
     
-    if (firstCharList == nil && secondCharList == nil) || (firstCharList?.count == 0 && secondCharList?.count == 0){
+    if (greenCharCount == nil && blueCharCount == nil) || (greenCharCount?.count == 0 && blueCharCount?.count == 0){
         return nil
     }
     
-    let firstCombine = firstCharList?.mapValues({ CombinedValue(precedence: .green, $0) })
-    let secondCombine = secondCharList?.mapValues({ CombinedValue(precedence: .blue, $0) })
+    let greenCombine = greenCharCount?.mapValues({ CombinedValue(precedence: .green, $0) })
+    let blueCombine = blueCharCount?.mapValues({ CombinedValue(precedence: .blue, $0) })
     
-    return firstCombine?.merging(secondCombine!, uniquingKeysWith: { $0.count > $1.count ? $0 : $0.count == $1.count ? CombinedValue(precedence: .equal, count: $0.count) : $1 })
+    return greenCombine?.merging(blueCombine!, uniquingKeysWith: {
+        $0.count > $1.count ?
+            $0
+            : $0.count == $1.count ?
+                CombinedValue(precedence: .equal, count: $0.count)
+            : $1
+    })
 }
 
 func charCount(_ input: String) -> [Character: Int]?{
@@ -239,22 +244,22 @@ class SolutionTest: XCTestCase {
     }
     
     func test_sortingKey_properInput_notNilOutput() {
-        let input: [Character: CombinedValue] = ["d": (Favourite.green, 4)]
+        let input: [Character: CombinedValue] = ["d": (Heart.green, 4)]
         XCTAssertNotNil(sortKeys(input))
     }
     
     func test_sortingKey_heightCount_loweIndex() {
-        let input: [Character: CombinedValue] = ["d": (Favourite.green, 4),
-                                                 "v": (Favourite.blue, 8)]
+        let input: [Character: CombinedValue] = ["d": (Heart.green, 4),
+                                                 "v": (Heart.blue, 8)]
         let output = sortKeys(input)
         XCTAssertTrue(output!.firstIndex(of: "v")! < output!.firstIndex(of: "d")!)
     }
     
     func test_sortingKey_sameCount_precedenceOrdered() {
-        let input:[Character: CombinedValue] = ["z": (Favourite.equal, 4),
-                                                "d": (Favourite.blue, 4),
-                                                "j": (Favourite.green, 4),
-                                                "v": (Favourite.blue, 8)
+        let input:[Character: CombinedValue] = ["z": (Heart.equal, 4),
+                                                "d": (Heart.blue, 4),
+                                                "j": (Heart.green, 4),
+                                                "v": (Heart.blue, 8)
         ]
         let output = sortKeys(input)!
         let firstOrder = output.firstIndex(of: "j")! < output.firstIndex(of: "d")!
@@ -264,14 +269,14 @@ class SolutionTest: XCTestCase {
     
     func test_sortingKey_sameCountSamePrecedence_alphabeticOrdered() {
         let input:[Character: CombinedValue] = [
-            "z": (Favourite.equal, 4),
-            "d": (Favourite.blue, 4),
-            "j": (Favourite.green, 4),
-            "k": (Favourite.blue, 4),
-            "i": (Favourite.green, 4),
-            "l": (Favourite.equal, 4),
-            "o": (Favourite.equal, 6),
-            "v": (Favourite.blue, 8)
+            "z": (Heart.equal, 4),
+            "d": (Heart.blue, 4),
+            "j": (Heart.green, 4),
+            "k": (Heart.blue, 4),
+            "i": (Heart.green, 4),
+            "l": (Heart.equal, 4),
+            "o": (Heart.equal, 6),
+            "v": (Heart.blue, 8)
         ]
         let output = sortKeys(input)!
         let firstOrder = output.firstIndex(of: "i")! < output.firstIndex(of: "j")!
@@ -306,27 +311,27 @@ class SolutionTest: XCTestCase {
     }
     
     func test_format_multpleChar_timesPrint(){
-        let output = format(["z": (Favourite.equal, 4)],
+        let output = format(["z": (Heart.equal, 4)],
                             with: ["z"])
         XCTAssertTrue(output.contains("zzzz"))
     }
     
     func test_format_returnShouldContainInputAsPrefix() {
-        let output = format(["z": (Favourite.equal, 4)],
+        let output = format(["z": (Heart.equal, 4)],
                             with: ["z"])
         XCTAssertTrue(output.contains("💖 = [4 times z] zzzz"))
     }
     
     func test_format_lasEntry_shouldNotContaintSlash() {
-        let output = format(["z": (Favourite.equal, 4)],
+        let output = format(["z": (Heart.equal, 4)],
                             with: ["z"])
         XCTAssertNotEqual(String(output.last!), "\n")
     }
     
     func test_amongTwoEntry_slashShouldPresent() {
         let output = format([
-            "z": (Favourite.equal, 4),
-            "a": (Favourite.green, 3)
+            "z": (Heart.equal, 4),
+            "a": (Heart.green, 3)
             ], with: ["z" , "a"])
         XCTAssertTrue(output.contains("\n"))
         XCTAssertEqual(output.filter({ $0 == "\n" }).count, 1)
