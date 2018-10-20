@@ -64,8 +64,8 @@ func sortKeys(_ input: [Character: CombinedValue]?) -> [Character]?{
 func combinedMaxChar(_ firstInput: String, _ secondInput: String) -> [Character: CombinedValue]?{
     guard firstInput != secondInput else { return nil }
     
-    let firstCharList = parseChar(firstInput)
-    let secondCharList = parseChar(secondInput)
+    let firstCharList = charCount(firstInput)
+    let secondCharList = charCount(secondInput)
     
     if (firstCharList == nil && secondCharList == nil) || (firstCharList?.count == 0 && secondCharList?.count == 0){
         return nil
@@ -77,15 +77,15 @@ func combinedMaxChar(_ firstInput: String, _ secondInput: String) -> [Character:
     return firstCombine?.merging(secondCombine!, uniquingKeysWith: { $0.count > $1.count ? $0 : $0.count == $1.count ? CombinedValue(precedence: .equal, count: $0.count) : $1 })
 }
 
-func parseChar(_ input: String) -> [Character: Int]?{
-    let valid = input.components(separatedBy: CharacterSet.lowercaseLetters.inverted).joined()
-    guard valid.count > 1 else { return nil }
+func charCount(_ input: String) -> [Character: Int]?{
+    let lowerCase = input.components(separatedBy: CharacterSet.lowercaseLetters.inverted).joined()
+    guard lowerCase.count > 1 else { return nil }
     
-    var output = [Character: Int]()
+    var charCount = [Character: Int]()
     
-    valid.map({ output[$0] = output.keys.contains($0) ? output[$0]! + 1 :  1 })
+    lowerCase.map({ charCount[$0] = charCount.keys.contains($0) ? charCount[$0]! + 1 :  1 })
     
-    return output.filter({ $0.value > 1 })
+    return charCount.filter({ $0.value > 1 })
 }
 
 compareQuote("To be or not To be", "Nothing is permanent")
@@ -97,29 +97,29 @@ class SolutionTest: XCTestCase {
     
     // MARK: - Parsing
     func test_parseChar_EmptyChar_occuranceNil() {
-        XCTAssertNil(parseChar(""))
+        XCTAssertNil(charCount(""))
     }
     
     func test_parseChar_single_occuranceNotNil() {
-        XCTAssertNotNil(parseChar("aa"))
+        XCTAssertNotNil(charCount("aa"))
     }
     
     func test_parseChar_forSingleChar_occuranceNil() {
-        XCTAssertNil(parseChar("a"))
+        XCTAssertNil(charCount("a"))
     }
     
     func test_parseChar_TwoSameChar_occuranceTwo() {
-        let total = parseChar("aa")?["a"]
+        let total = charCount("aa")?["a"]
         XCTAssertEqual(total, 2)
     }
     
     func test_parseChar_ThreeSameChar_occuranceThree() {
-        let total = parseChar("aaa")?["a"]
+        let total = charCount("aaa")?["a"]
         XCTAssertEqual(total, 3)
     }
     
     func test_parseChar_mixChar_occuranceCorrespondingTimes() {
-        let output = parseChar("aaabbbb")
+        let output = charCount("aaabbbb")
         let totalA = output?["a"]
         let totalB = output?["b"]
         
@@ -128,7 +128,7 @@ class SolutionTest: XCTestCase {
     }
     
     func test_parseChar_mixChar_SingleEntry_occuranceNil_ForSingleEntry() {
-        let output = parseChar("aaabbbbc")
+        let output = charCount("aaabbbbc")
         let totalA = output?["a"]
         let totalB = output?["b"]
         let totalC = output?["c"]
@@ -139,7 +139,7 @@ class SolutionTest: XCTestCase {
     }
     
     func test_parseChar_mixChar_InvalidCahrEntry_occuranceNil_ForInvalidCahr() {
-        let output = parseChar("aaabbbbc***##)))")
+        let output = charCount("aaabbbbc***##)))")
         let totalA = output?["a"]
         let totalB = output?["b"]
         let totalC = output?["c"]
@@ -157,7 +157,7 @@ class SolutionTest: XCTestCase {
     
     func test_parseChar_String() {
         let input = "Are they here yes, they are here"
-        let output = parseChar(input)
+        let output = charCount(input)
         
         XCTAssertEqual(output?["e"], 9)
         XCTAssertEqual(output?["y"], 3)
