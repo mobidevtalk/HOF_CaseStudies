@@ -54,7 +54,7 @@ func sortKeys(_ input: [Character: CombinedValue]?) -> [Character]?{
     return input.sorted(by: {
         $0.value.count == $1.value.count ?
             $0.value.precedence.weight == $1.value.precedence.weight ?
-                $0.key < $1.key // 3. count same and weight(1,2,E) same, so based on alphabatically
+                $0.key < $1.key // 3. count same and weight(1,2,E) same, so based on alphabetically
                 : $0.value.precedence.weight > $1.value.precedence.weight // 2. count same, so based on weight 1 > 2 > 3
             : $0.value.count > $1.value.count   // 1. based on count
     }).map({ $0.key })
@@ -70,8 +70,8 @@ func combinedMaxChar(_ firstQuote: String, _ secondQuote: String) -> [Character:
         return nil
     }
     
-    let greenCombine = greenCharCount?.mapValues({ CombinedValue(precedence: .green, $0) })
-    let blueCombine = blueCharCount?.mapValues({ CombinedValue(precedence: .blue, $0) })
+    let greenCombine = greenCharCount?.mapValues({ CombinedValue(precedence: .green, count: $0) })
+    let blueCombine = blueCharCount?.mapValues({ CombinedValue(precedence: .blue, count: $0) })
     
     return greenCombine?.merging(blueCombine!, uniquingKeysWith: {
         $0.count > $1.count ?
