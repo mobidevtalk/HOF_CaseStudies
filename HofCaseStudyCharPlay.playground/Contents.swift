@@ -11,11 +11,11 @@ extension Heart{
     var weight: Int{
         switch self {
         case .green:
-            return 2
+            return 3
         case .blue:
-            return 1
+            return 2
         default:
-            return 0
+            return 1
         }
     }
 }
